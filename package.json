@@ -1,0 +1,11 @@
+{
+  "name": "node-web-scraper",
+  "description": "Lighweight web crawler and scraper",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/scraper",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "request": "^2.81.0"
+  }
+}
