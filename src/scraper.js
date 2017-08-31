@@ -12,10 +12,6 @@ Scraper.prototype.shouldScrape = function(url){
 };
 
 Scraper.prototype.scrape = function(page){
-    if(!this.shouldScrape(page)){
-        return null;
-    }
-
     return this.rules.map(function(rule){
         return rule.scrape(page);
     });

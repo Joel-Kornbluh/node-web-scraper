@@ -30,7 +30,7 @@ ScrapeRule.prototype.scrape = function(page){
         return null;
     }
 
-    let modal = this.model;
+    let model = this.model;
     let data = {};
 
     for (let key of Object.keys(model)) {

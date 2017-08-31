@@ -24,6 +24,8 @@ function Crawler (baseUrl, scraper, options = {}) {
     this.queue = [baseUrl];
     this.crawled = [];
     this.scrapedData = [];
+
+    this._finally = this._finally.bind(this);
 }
 
 Crawler.prototype._currentThreadCount = null;
@@ -75,7 +77,7 @@ Crawler.prototype.collectLinks = function (page){
         .map(function(index, linkNode){
             try {
                 return url
-                    .resolve(baseUrl, linkNode.attribs.href)
+                    .resolve(page.url, linkNode.attribs.href)
                     .split('#')[0];
             } catch (e){
                 return '';
@@ -91,7 +93,6 @@ Crawler.prototype.collectLinks = function (page){
 
 Crawler.prototype.crawl = function(){
     if(!this.queue.length){
-        this._resolve(self.scrapedData);
         return this.promise;
     }
 
@@ -122,17 +123,22 @@ Crawler.prototype.crawl = function(){
                 data: self.scraper.scrape(page)
             });
         }
-    }).finally(function(){
-        self._currentThreadCount--;
-
-        if(!self.queue.length){
-            self._resolve(self.scrapedData);
-        } else if(self._currentThreadCount < self.maxThreadCount){
-            self.crawl();
-        }
-    });
+    }).then(self._finally, self._finally);
 
     return this.promise;
+};
+
+Crawler.prototype._finally = function(){
+    this._currentThreadCount--;
+
+    if(!this.queue.length && this._currentThreadCount < 1){
+        this._resolve(this.scrapedData);
+        return;
+    }
+
+    while(this._currentThreadCount < this.maxThreadCount){
+        this.crawl();
+    }
 };
 
 module.exports = Crawler;
